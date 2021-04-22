@@ -22,6 +22,8 @@ func main() {
 
 	if clearConfigCache {
 		deleteConfigCache()
+		loadConfig()
+		return
 	}
 
 	var canteenData io.Reader
