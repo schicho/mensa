@@ -9,6 +9,7 @@ import (
 	"github.com/schicho/mensa/canteen"
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/download"
+	"github.com/schicho/mensa/util"
 	"io"
 	"log"
 	"os"
@@ -55,7 +56,7 @@ func main() {
 		// Duplicate downloaded CSV data, store to disk and write back into the Reader.
 		buffer := bytes.Buffer{}
 		mw := io.MultiWriter(cacheFile, &buffer)
-		_, err = mw.Write(download.ReaderToByte(canteenData))
+		_, err = mw.Write(util.ReaderToByte(canteenData))
 		if err != nil {
 			log.Println(err)
 		}

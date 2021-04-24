@@ -1,10 +1,10 @@
 package download
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/schicho/mensa/csvutil"
+	"github.com/schicho/mensa/util"
 	"io"
 	"net/http"
 	"strings"
@@ -26,7 +26,7 @@ func GetCSV(url string) (io.Reader, error) {
 	}
 	defer resp.Body.Close()
 
-	responseString := csvutil.Windows1252ToUTF8(ReaderToByte(resp.Body))
+	responseString := csvutil.Windows1252ToUTF8(util.ReaderToByte(resp.Body))
 
 	// Fix formatting early, so we don't need to bother later.
 	responseString = csvutil.FixCSVFormatting(responseString)
@@ -45,14 +45,4 @@ func GenerateURL(universityAbbrev string) string {
 		week++
 	}
 	return fmt.Sprintf("%s/%s/%d%s", urlPrefix, universityAbbrev, week, urlPostfix)
-}
-
-// ReaderToByte reads an io.Reader into a byte slice and returns it.
-func ReaderToByte(stream io.Reader) []byte {
-	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(stream)
-	if err != nil {
-		panic(err)
-	}
-	return buf.Bytes()
 }
