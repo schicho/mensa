@@ -27,7 +27,7 @@ var Canteens2Abbrev = map[string]string{
 	"UNI_PASSAU_NIKOLA_CAFETERIA":         "Cafeteria-Nikolakloster",
 	"HS_DEGGENDORF_CANTEEN":               "HS-DEG",
 	"HS_LANDSHUT_CANTEEN":                 "HS-LA",
-	"HS_STRAUBING_CANTEEN":                "HS-RA",
+	"HS_STRAUBING_CANTEEN":                "HS-SR",
 	"HS_PFARRKIRCHEN_CANTEEN":             "HS-PAN",
 }
 
