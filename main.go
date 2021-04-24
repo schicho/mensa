@@ -36,7 +36,8 @@ func main() {
 	currentYear, currentWeek := time.Now().ISOWeek()
 
 	// Check if we can (still) use the cached data or need to download first and cache.
-	if cachedWeek < currentWeek || cachedYear < currentYear || currentWeekday == time.Saturday || currentWeekday == time.Sunday || !exists(filepathCache) {
+	if cachedWeek < currentWeek || cachedYear < currentYear || ((currentWeekday == time.
+		Saturday || currentWeekday == time.Sunday) && config.Cached.Unix() < time.Now().Unix()) || !exists(filepathCache) {
 		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[config.University])
 
 		updateConfigFile()
