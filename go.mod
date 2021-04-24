@@ -1,4 +1,4 @@
-module mensa
+module github.com/schicho/mensa
 
 go 1.16
 

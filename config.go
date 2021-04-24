@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/schicho/mensa/canteen"
 	"io"
 	"log"
-	"mensa/canteen"
 	"os"
 	"time"
 )
