@@ -16,6 +16,11 @@ import (
 	"time"
 )
 
+const (
+	colorReset = "\033[0m"
+	colorRed   = "\033[31;1m"
+)
+
 func main() {
 	var clearConfigCache bool
 	flag.BoolVar(&clearConfigCache, "c", false, "clear config and cache")
@@ -92,7 +97,13 @@ func main() {
 	date := ""
 	for _, meal := range meals {
 		if meal.Date != date {
-			fmt.Println(meal.Date, "-----------------------------")
+			timestamp, err := time.Parse("02.01.2006", meal.Date)
+			if err != nil {
+				panic(err)
+			}
+			day := timestamp.Weekday()
+
+			fmt.Printf("%s%v %v:%s\n", colorRed, meal.Date, day, colorReset)
 			date = meal.Date
 		}
 		fmt.Printf("\t- %s\n", meal.Name)
