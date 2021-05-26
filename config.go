@@ -27,13 +27,14 @@ var config Config
 
 // init the filepath to config and cache.
 func init() {
-	homeDir, err := os.UserHomeDir()
+	configDir, err := os.UserConfigDir()
+	cacheDir, err := os.UserCacheDir()
 	if err != nil {
 		log.Println("Cannot access home directory.")
 		log.Fatal(err)
 	}
-	filepathConfig = homeDir + "/" + filenameConfig
-	filepathCache = homeDir + "/" + filenameCache
+	filepathConfig = configDir + "/" + filenameConfig
+	filepathCache = cacheDir + "/" + filenameCache
 }
 
 // loadConfig checks if there exists a previous configuration and loads it, or generates a new one and saves it to disk.
@@ -66,13 +67,7 @@ func loadConfig() {
 
 // updateConfigFile just updates the timestamp in the configuration file, if new data was cached.
 func updateConfigFile() {
-	now := time.Now()
-	newTime := now
-	if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
-		// Kinda hacky. We just want a new timestamp from the following week on a weekday.
-		newTime = now.Add(48 * time.Hour)
-	}
-	config = Config{config.University, newTime}
+	config = Config{config.University, time.Now()}
 	writeConfigFile()
 }
 

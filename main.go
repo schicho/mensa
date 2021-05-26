@@ -36,12 +36,16 @@ func main() {
 
 	loadConfig()
 
-	cachedYear, cachedWeek := config.Cached.ISOWeek()
+	cachedYear, _ := config.Cached.ISOWeek()
+	currentYear, _ := time.Now().ISOWeek()
+
+	cachedDay := config.Cached.YearDay()
+	currentDay := time.Now().YearDay()
+
 	currentWeekday := time.Now().Weekday()
-	currentYear, currentWeek := time.Now().ISOWeek()
 
 	// Check if we can (still) use the cached data or need to download first and cache.
-	if cachedWeek < currentWeek || cachedYear < currentYear || ((currentWeekday == time.
+	if cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
 		Saturday || currentWeekday == time.Sunday) && config.Cached.Unix() < time.Now().Unix()) || !exists(filepathCache) {
 		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[config.University])
 
