@@ -110,6 +110,6 @@ func main() {
 			fmt.Printf("%s%v %v:%s\n", colorRed, meal.Date, day, colorReset)
 			date = meal.Date
 		}
-		fmt.Printf("\t- %s\n", meal.Name)
+		fmt.Printf("\t- %s [%s]\n", meal.Name, meal.MealType)
 	}
 }
