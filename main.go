@@ -92,8 +92,8 @@ func main() {
 
 	// Shorten too long entries.
 	for _, meal := range meals {
-		if len(meal.Name) > 69 {
-			meal.Name = meal.Name[:65] + "..."
+		if len(meal.Name) > 60 {
+			meal.Name = meal.Name[:55] + "..."
 		}
 	}
 
