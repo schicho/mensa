@@ -23,7 +23,9 @@ const (
 
 func main() {
 	var clearConfigCache bool
+	var forceDownloadData bool
 	flag.BoolVar(&clearConfigCache, "c", false, "clear config and cache")
+	flag.BoolVar(&forceDownloadData, "d", false, "force downloading/updating the canteen data")
 	flag.Parse()
 
 	if clearConfigCache {
@@ -45,7 +47,7 @@ func main() {
 	currentWeekday := time.Now().Weekday()
 
 	// Check if we can (still) use the cached data or need to download first and cache.
-	if cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
+	if forceDownloadData || cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
 		Saturday || currentWeekday == time.Sunday) && config.Cached.Unix() < time.Now().Unix()) || !exists(filepathCache) {
 		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[config.University])
 
