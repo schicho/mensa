@@ -13,6 +13,7 @@ var replaceNewlineSemicolon = strings.NewReplacer("\n;", ";")
 // NewSemicolonReader is a stdlib CSV reader, but with a semicolon as separator, as it's needed for the files we parse.
 func NewSemicolonReader(in io.Reader) gocsv.CSVReader {
 	r := csv.NewReader(in)
+	r.LazyQuotes = true
 	r.Comma = ';'
 	return r
 }
