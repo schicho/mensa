@@ -95,7 +95,7 @@ func main() {
 	// Shorten too long entries.
 	for _, meal := range meals {
 		if len(meal.Name) > 60 {
-			meal.Name = meal.Name[:55] + "..."
+			meal.Name = meal.Name[:(60-len(meal.MealType))] + "..."
 		}
 	}
 
@@ -112,6 +112,6 @@ func main() {
 			fmt.Printf("%s%v %v:%s\n", colorRed, meal.Date, day, colorReset)
 			date = meal.Date
 		}
-		fmt.Printf("\t- %s [%s]\n", meal.Name, meal.MealType)
+		fmt.Printf("    - %s : %s [%s]\n", meal.PriceStudent, meal.Name, meal.MealType)
 	}
 }
