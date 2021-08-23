@@ -1,10 +1,10 @@
 package download
 
 import (
+	"io"
 	"errors"
 	"fmt"
 	"github.com/schicho/mensa/csvutil"
-	"github.com/schicho/mensa/util"
 	"net/http"
 	"time"
 )
@@ -24,7 +24,12 @@ func GetCSV(url string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	responseString := csvutil.Windows1252ToUTF8(util.ReaderToByte(resp.Body))
+	responseBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic("could not read response")
+	}
+
+	responseString := csvutil.Windows1252ToUTF8(responseBytes)
 
 	// Fix formatting early, so we don't need to bother later.
 	responseString = csvutil.FixCSVFormatting(responseString)
