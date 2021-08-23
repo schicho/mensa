@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/util"
-	"io"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -19,7 +17,7 @@ const (
 
 // GetCSV gets the CSV via the internet. Fixes the formatting errors in the csv.
 // Finally provides a new io.Reader to read correct CSVs from.
-func GetCSV(url string) (io.Reader, error) {
+func GetCSV(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, errors.New("could not get file")
@@ -31,7 +29,7 @@ func GetCSV(url string) (io.Reader, error) {
 	// Fix formatting early, so we don't need to bother later.
 	responseString = csvutil.FixCSVFormatting(responseString)
 
-	return strings.NewReader(responseString), nil
+	return []byte(responseString), nil
 }
 
 // GenerateURL for the asked university and current/next week.

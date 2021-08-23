@@ -1,8 +1,7 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
+	"io/ioutil"
 	"flag"
 	"fmt"
 	"github.com/gocarina/gocsv"
@@ -10,8 +9,6 @@ import (
 	"github.com/schicho/mensa/config"
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/download"
-	"github.com/schicho/mensa/util"
-	"io"
 	"log"
 	"os"
 	"time"
@@ -34,27 +31,26 @@ func main() {
 		return
 	}
 
-	var canteenData io.Reader
-
 	// Have main package configuration equal to the one in the config package
 	config.LoadConfig()
 	configuration := *config.GetConfig()
 
 	cachedYear, _ := configuration.Cached.ISOWeek()
 	currentYear, _ := time.Now().ISOWeek()
-
 	cachedDay := configuration.Cached.YearDay()
 	currentDay := time.Now().YearDay()
-
 	currentWeekday := time.Now().Weekday()
+
+	var canteenData []byte
+	var err error
 
 	// Check if we can (still) use the cached data or need to download first and cache.
 	if forceDownloadData || cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
 		Saturday || currentWeekday == time.Sunday) && configuration.Cached.Unix() < time.Now().Unix()) || !config.Exists(config.FilepathCache) {
-		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
+		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
+		
 		config.UpdateConfigFile()
-		var err error
 		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
 		if err != nil {
 			panic(err)
@@ -66,15 +62,11 @@ func main() {
 			log.Println(err)
 		}
 		defer cacheFile.Close()
-
-		// Duplicate downloaded CSV data, store to disk and write back into the Reader.
-		buffer := bytes.Buffer{}
-		mw := io.MultiWriter(cacheFile, &buffer)
-		_, err = mw.Write(util.ReaderToByte(canteenData))
+		
+		_, err = cacheFile.Write(canteenData)
 		if err != nil {
 			log.Println(err)
 		}
-		canteenData = bytes.NewReader(buffer.Bytes())
 
 	} else {
 		fmt.Println("Using cached data of", canteen.Abbrev2Canteens[configuration.University])
@@ -83,13 +75,13 @@ func main() {
 			panic(err)
 		}
 		defer canteenDataFile.Close()
-		canteenData = bufio.NewReader(canteenDataFile)
+		canteenData, err = ioutil.ReadAll(canteenDataFile)
 	}
 
 	var meals []*canteen.Dish
 
 	gocsv.SetCSVReader(csvutil.NewSemicolonReader)
-	err := gocsv.Unmarshal(canteenData, &meals)
+	err = gocsv.UnmarshalBytes(canteenData, &meals)
 	if err != nil {
 		log.Fatalln(err)
 	}
