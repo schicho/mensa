@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-const FilenameConfig = "mensa_conf"
-const FilenameCache = "mensa_data"
+const FilenameConfig = "mensa_conf.json"
+const FilenameCache = "mensa_data.csv"
 
 var FilepathConfig string
 var FilepathCache string
@@ -105,12 +105,13 @@ func deleteConfigCache() {
 	}
 }
 
+// BuildNewConfig deletes the config and cache files from disk and creates a new default config file.
 func BuildNewConfig() {
 	deleteConfigCache()
 	LoadConfig()
 }
 
-// exists checks if a file or directory exists.
+// Exists checks if a file or directory exists.
 func Exists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
