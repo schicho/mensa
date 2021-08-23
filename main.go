@@ -10,6 +10,7 @@ import (
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/download"
 	"github.com/schicho/mensa/util"
+	"github.com/schicho/mensa/config"
 	"io"
 	"log"
 	"os"
@@ -29,37 +30,38 @@ func main() {
 	flag.Parse()
 
 	if clearConfigCache {
-		deleteConfigCache()
-		loadConfig()
+		config.BuildNewConfig()
 		return
 	}
 
 	var canteenData io.Reader
 
-	loadConfig()
+	// Have main package configuration equal to the one in the config package
+	config.LoadConfig()
+	configuration := *config.GetConfig()
 
-	cachedYear, _ := config.Cached.ISOWeek()
+	cachedYear, _ := configuration.Cached.ISOWeek()
 	currentYear, _ := time.Now().ISOWeek()
 
-	cachedDay := config.Cached.YearDay()
+	cachedDay := configuration.Cached.YearDay()
 	currentDay := time.Now().YearDay()
 
 	currentWeekday := time.Now().Weekday()
 
 	// Check if we can (still) use the cached data or need to download first and cache.
 	if forceDownloadData || cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
-		Saturday || currentWeekday == time.Sunday) && config.Cached.Unix() < time.Now().Unix()) || !exists(filepathCache) {
-		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[config.University])
+		Saturday || currentWeekday == time.Sunday) && configuration.Cached.Unix() < time.Now().Unix()) || !config.Exists(config.FilepathCache) {
+		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
-		updateConfigFile()
+		config.UpdateConfigFile()
 		var err error
-		canteenData, err = download.GetCSV(download.GenerateURL(config.University))
+		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
 		if err != nil {
 			panic(err)
 		}
 
 		// Cache the CSV in a file.
-		cacheFile, err := os.OpenFile(filepathCache, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+		cacheFile, err := os.OpenFile(config.FilepathCache, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 		if err != nil {
 			log.Println(err)
 		}
@@ -75,8 +77,8 @@ func main() {
 		canteenData = bytes.NewReader(buffer.Bytes())
 
 	} else {
-		fmt.Println("Using cached data of", canteen.Abbrev2Canteens[config.University])
-		canteenDataFile, err := os.OpenFile(filepathCache, os.O_RDONLY, os.ModePerm)
+		fmt.Println("Using cached data of", canteen.Abbrev2Canteens[configuration.University])
+		canteenDataFile, err := os.OpenFile(config.FilepathCache, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			panic(err)
 		}

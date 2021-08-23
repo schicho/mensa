@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-const filenameConfig = "mensa_conf"
-const filenameCache = "mensa_data"
+const FilenameConfig = "mensa_conf"
+const FilenameCache = "mensa_data"
 
-var filepathConfig string
-var filepathCache string
+var FilepathConfig string
+var FilepathCache string
 
 // Config describes the json layout of the saved config file.
 type Config struct {
@@ -22,8 +22,11 @@ type Config struct {
 	Cached     time.Time `json:"cached"`
 }
 
-// package level variable to have access to the loaded or generated configuration.
 var config Config
+
+func GetConfig() *Config{
+	return &config
+}
 
 // init the filepath to config and cache.
 func init() {
@@ -33,14 +36,14 @@ func init() {
 		log.Println("Cannot access home directory.")
 		log.Fatal(err)
 	}
-	filepathConfig = configDir + "/" + filenameConfig
-	filepathCache = cacheDir + "/" + filenameCache
+	FilepathConfig = configDir + "/" + FilenameConfig
+	FilepathCache = cacheDir + "/" + FilenameCache
 }
 
-// loadConfig checks if there exists a previous configuration and loads it, or generates a new one and saves it to disk.
-func loadConfig() {
-	if exists(filepathConfig) {
-		configFile, err := os.OpenFile(filepathConfig, os.O_RDONLY, os.ModePerm)
+// LoadConfig checks if there exists a previous configuration and loads it, or generates a new one and saves it to disk.
+func LoadConfig() {
+	if Exists(FilepathConfig) {
+		configFile, err := os.OpenFile(FilepathConfig, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			panic(err)
 		}
@@ -65,8 +68,8 @@ func loadConfig() {
 	}
 }
 
-// updateConfigFile just updates the timestamp in the configuration file, if new data was cached.
-func updateConfigFile() {
+// UpdateConfigFile just updates the timestamp in the configuration file, if new data was cached.
+func UpdateConfigFile() {
 	config = Config{config.University, time.Now()}
 	writeConfigFile()
 }
@@ -78,7 +81,7 @@ func writeConfigFile() {
 		panic(err)
 	}
 
-	configFile, err := os.OpenFile(filepathConfig, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+	configFile, err := os.OpenFile(FilepathConfig, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		log.Println("Could not create configuration file.")
 		return
@@ -92,18 +95,23 @@ func writeConfigFile() {
 }
 
 func deleteConfigCache() {
-	err := os.Remove(filepathConfig)
+	err := os.Remove(FilepathConfig)
 	if err != nil {
 		log.Fatalln("Could not clear config.")
 	}
-	err = os.Remove(filepathCache)
+	err = os.Remove(FilepathCache)
 	if err != nil {
 		log.Fatalln("Could not clear cache.")
 	}
 }
 
+func BuildNewConfig() {
+	deleteConfigCache()
+	LoadConfig()
+}
+
 // exists checks if a file or directory exists.
-func exists(name string) bool {
+func Exists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
 			return false
