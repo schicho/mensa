@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-const filenameConfig = ".mensa"
-const filenameCache = ".mensa_CSV"
+const filenameConfig = "mensa_conf"
+const filenameCache = "mensa_data"
 
 var filepathConfig string
 var filepathCache string
