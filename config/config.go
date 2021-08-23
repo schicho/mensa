@@ -16,14 +16,16 @@ const FilenameCache = "mensa_data.csv"
 var FilepathConfig string
 var FilepathCache string
 
+// config stores the currently loaded user data configuration
+var config Config
+
 // Config describes the json layout of the saved config file.
 type Config struct {
 	University string    `json:"university"`
 	Cached     time.Time `json:"cached"`
 }
 
-var config Config
-
+// GetConfig returns a pointer to the loaded user data
 func GetConfig() *Config{
 	return &config
 }
