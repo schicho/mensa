@@ -14,23 +14,28 @@ import (
 	"time"
 )
 
-const (
-	colorReset = "\033[0m"
-	colorRed   = "\033[31;1m"
-)
+var colorReset = "\033[0m"
+var colorRed = "\033[31;1m"
 
 func main() {
 	var clearConfigCache bool
 	var forceDownloadData bool
 	var printTodayOnly bool
+	var printNoColor bool
 	flag.BoolVar(&clearConfigCache, "c", false, "clear config and cache")
 	flag.BoolVar(&forceDownloadData, "d", false, "force downloading/updating the canteen data")
 	flag.BoolVar(&printTodayOnly, "t", false, "only print the meals served today")
+	flag.BoolVar(&printNoColor, "n", false, "do not color the output text (no red weekdays)")
 	flag.Parse()
 
 	if clearConfigCache {
 		config.BuildNewConfig()
 		return
+	}
+
+	if printNoColor {
+		colorReset = ""
+		colorRed = ""
 	}
 
 	// Have main package configuration equal to the one in the config package
