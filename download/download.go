@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/schicho/mensa/csvutil"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
