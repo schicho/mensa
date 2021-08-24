@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"flag"
 	"fmt"
 	"github.com/gocarina/gocsv"
@@ -9,6 +8,7 @@ import (
 	"github.com/schicho/mensa/config"
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/download"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -22,8 +22,10 @@ const (
 func main() {
 	var clearConfigCache bool
 	var forceDownloadData bool
+	var printTodayOnly bool
 	flag.BoolVar(&clearConfigCache, "c", false, "clear config and cache")
 	flag.BoolVar(&forceDownloadData, "d", false, "force downloading/updating the canteen data")
+	flag.BoolVar(&printTodayOnly, "t", false, "only print the meals served today")
 	flag.Parse()
 
 	if clearConfigCache {
@@ -49,7 +51,7 @@ func main() {
 		Saturday || currentWeekday == time.Sunday) && configuration.Cached.Unix() < time.Now().Unix()) || !config.Exists(config.FilepathCache) {
 
 		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
-		
+
 		config.UpdateConfigFile()
 		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
 		if err != nil {
@@ -62,7 +64,7 @@ func main() {
 			log.Println(err)
 		}
 		defer cacheFile.Close()
-		
+
 		_, err = cacheFile.Write(canteenData)
 		if err != nil {
 			log.Println(err)
@@ -93,19 +95,32 @@ func main() {
 		}
 	}
 
-	// Separate dishes by day and print.
-	date := ""
-	for _, meal := range meals {
-		if meal.Date != date {
-			timestamp, err := time.Parse("02.01.2006", meal.Date)
-			if err != nil {
-				panic(err)
-			}
-			day := timestamp.Weekday()
+	// Separate dishes by day.
+	type MealDay struct {
+		*canteen.Dish
+		Weekday time.Weekday
+	}
+	var mealsByDay [7][]MealDay
 
-			fmt.Printf("%s%v %v:%s\n", colorRed, meal.Date, day, colorReset)
-			date = meal.Date
+	for _, meal := range meals {
+		timestamp, err := time.Parse("02.01.2006", meal.Date)
+		if err != nil {
+			panic(err)
 		}
-		fmt.Printf("    - %s : %s [%s]\n", meal.PriceStudent, meal.Name, meal.MealType)
+		weekday := timestamp.Weekday()
+		mealsByDay[weekday] = append(mealsByDay[weekday], MealDay{meal, weekday})
+	}
+
+	// Print dishes sorted by weekdays.
+	todayWeekday := time.Now().Weekday()
+	for _, meals := range mealsByDay {
+		if len(meals) > 0 {
+			if !(printTodayOnly && meals[0].Weekday != todayWeekday) {
+				fmt.Printf("%s%v %v:%s\n", colorRed, meals[0].Date, meals[0].Weekday, colorReset)
+				for _, meal := range meals {
+					fmt.Printf("    - %s : %s [%s]\n", meal.PriceStudent, meal.Name, meal.MealType)
+				}
+			}
+		}
 	}
 }
