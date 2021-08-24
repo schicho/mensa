@@ -118,7 +118,14 @@ func main() {
 			if !(printTodayOnly && meals[0].Weekday != todayWeekday) {
 				fmt.Printf("%s%v %v:%s\n", colorRed, meals[0].Date, meals[0].Weekday, colorReset)
 				for _, meal := range meals {
-					fmt.Printf("    - %s : %s [%s]\n", meal.PriceStudent, meal.Name, meal.MealType)
+					switch configuration.Price {
+					case config.PriceStudent_t:
+						fmt.Printf("    - %s : %s [%s]\n", meal.PriceStudent, meal.Name, meal.MealType)
+					case config.PriceEmployee_t:
+						fmt.Printf("    - %s : %s [%s]\n", meal.PriceEmployee, meal.Name, meal.MealType)
+					case config.PriceGuest_t:
+						fmt.Printf("    - %s : %s [%s]\n", meal.PriceGuest, meal.Name, meal.MealType)
+					}
 				}
 			}
 		}

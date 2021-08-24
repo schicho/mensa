@@ -1,10 +1,10 @@
 package download
 
 import (
-	"io"
 	"errors"
 	"fmt"
 	"github.com/schicho/mensa/csvutil"
+	"io"
 	"net/http"
 	"time"
 )

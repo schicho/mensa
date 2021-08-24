@@ -16,17 +16,26 @@ const FilenameCache = "mensa_data.csv"
 var FilepathConfig string
 var FilepathCache string
 
-// config stores the currently loaded user data configuration
-var config Config
+type PriceType string
+
+const (
+	PriceStudent_t  PriceType = "Student"
+	PriceEmployee_t PriceType = "Employee"
+	PriceGuest_t    PriceType = "Guest"
+)
 
 // Config describes the json layout of the saved config file.
 type Config struct {
 	University string    `json:"university"`
 	Cached     time.Time `json:"cached"`
+	Price      PriceType `json:"price"`
 }
 
+// config stores the currently loaded user data configuration
+var config Config
+
 // GetConfig returns a pointer to the loaded user data
-func GetConfig() *Config{
+func GetConfig() *Config {
 	return &config
 }
 
@@ -58,21 +67,21 @@ func LoadConfig() {
 
 		err = json.Unmarshal(buffer, &config)
 		if err != nil {
-			fmt.Println("Malformed configuration .mensa file. Defaulting to Uni Passau.")
-			config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}}
+			fmt.Println("Malformed configuration .mensa file. Defaulting to Student of Uni Passau.")
+			config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
 			writeConfigFile()
 		}
 	} else {
 		// Default to known values and create config file.
-		fmt.Println("No configuration .mensa file. Creating new file. Defaulting to Uni Passau.")
-		config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}}
+		fmt.Println("No configuration .mensa file. Creating new file. Defaulting to Student of Uni Passau.")
+		config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
 		writeConfigFile()
 	}
 }
 
 // UpdateConfigFile just updates the timestamp in the configuration file, if new data was cached.
 func UpdateConfigFile() {
-	config = Config{config.University, time.Now()}
+	config = Config{config.University, time.Now(), config.Price}
 	writeConfigFile()
 }
 
