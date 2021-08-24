@@ -67,13 +67,13 @@ func LoadConfig() {
 
 		err = json.Unmarshal(buffer, &config)
 		if err != nil {
-			fmt.Println("Malformed configuration .mensa file. Defaulting to Student of Uni Passau.")
+			fmt.Fprintln(os.Stderr, "Malformed `mensa_conf.json` file. Default to Student of Uni Passau.")
 			config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
 			writeConfigFile()
 		}
 	} else {
 		// Default to known values and create config file.
-		fmt.Println("No configuration .mensa file. Creating new file. Defaulting to Student of Uni Passau.")
+		fmt.Fprintln(os.Stderr, "No `mensa_conf.json` file. Creating new file. Default to Student of Uni Passau.")
 		config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
 		writeConfigFile()
 	}
@@ -106,6 +106,7 @@ func writeConfigFile() {
 }
 
 func deleteConfigCache() {
+	fmt.Fprintln(os.Stderr, "Deleting config and cache.")
 	err := os.Remove(FilepathConfig)
 	if err != nil {
 		log.Fatalln("Could not clear config.")

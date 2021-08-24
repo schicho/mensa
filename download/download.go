@@ -20,13 +20,13 @@ const (
 func GetCSV(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, errors.New("could not get file")
+		return nil, errors.New("Could not download mensa data.")
 	}
 	defer resp.Body.Close()
 
 	responseBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic("could not read response")
+		log.Fatalln("Could not read response.")
 	}
 
 	responseString := csvutil.Windows1252ToUTF8(responseBytes)

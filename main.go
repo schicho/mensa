@@ -50,7 +50,7 @@ func main() {
 	if forceDownloadData || cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
 		Saturday || currentWeekday == time.Sunday) && configuration.Cached.Unix() < time.Now().Unix()) || !config.Exists(config.FilepathCache) {
 
-		fmt.Println("Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
+		fmt.Fprintln(os.Stderr, "Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
 		config.UpdateConfigFile()
 		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
@@ -71,7 +71,7 @@ func main() {
 		}
 
 	} else {
-		fmt.Println("Using cached data of", canteen.Abbrev2Canteens[configuration.University])
+		fmt.Fprintln(os.Stderr, "Using cached data of", canteen.Abbrev2Canteens[configuration.University])
 		canteenDataFile, err := os.OpenFile(config.FilepathCache, os.O_RDONLY, os.ModePerm)
 		if err != nil {
 			panic(err)
