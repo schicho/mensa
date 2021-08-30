@@ -3,11 +3,12 @@ package download
 import (
 	"errors"
 	"fmt"
-	"github.com/schicho/mensa/csvutil"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/schicho/mensa/csvutil"
 )
 
 const (

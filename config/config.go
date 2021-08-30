@@ -3,11 +3,12 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/schicho/mensa/canteen"
 	"io"
 	"log"
 	"os"
 	"time"
+
+	"github.com/schicho/mensa/canteen"
 )
 
 const FilenameConfig = "mensa_conf.json"

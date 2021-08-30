@@ -2,10 +2,11 @@ package csvutil
 
 import (
 	"encoding/csv"
-	"github.com/gocarina/gocsv"
-	"golang.org/x/text/encoding/charmap"
 	"io"
 	"strings"
+
+	"github.com/gocarina/gocsv"
+	"golang.org/x/text/encoding/charmap"
 )
 
 var replaceNewlineSemicolon = strings.NewReplacer("\n;", ";")
