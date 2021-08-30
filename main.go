@@ -3,15 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"time"
+
 	"github.com/gocarina/gocsv"
 	"github.com/schicho/mensa/canteen"
 	"github.com/schicho/mensa/config"
 	"github.com/schicho/mensa/csvutil"
 	"github.com/schicho/mensa/download"
-	"io/ioutil"
-	"log"
-	"os"
-	"time"
+	"github.com/schicho/substring"
 )
 
 var colorReset = "\033[0m"
@@ -83,6 +85,9 @@ func main() {
 		}
 		defer canteenDataFile.Close()
 		canteenData, err = ioutil.ReadAll(canteenDataFile)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	var meals []*canteen.Dish
@@ -96,7 +101,7 @@ func main() {
 	// Shorten too long entries.
 	for _, meal := range meals {
 		if len(meal.Name) > 60 {
-			meal.Name = meal.Name[:(60-len(meal.MealType))] + "..."
+			meal.Name = substring.SubstringEnd(meal.Name, 60-len(meal.MealType)) + "..."
 		}
 	}
 
