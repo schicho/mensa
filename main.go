@@ -125,7 +125,7 @@ func main() {
 	todayWeekday := time.Now().Weekday()
 	for _, meals := range mealsByDay {
 		if len(meals) > 0 {
-			if !(printTodayOnly && meals[0].Weekday != todayWeekday) {
+			if !printTodayOnly || meals[0].Weekday == todayWeekday {
 				fmt.Printf("%s%v %v:%s\n", colorRed, meals[0].Date, meals[0].Weekday, colorReset)
 				for _, meal := range meals {
 					switch configuration.Price {
