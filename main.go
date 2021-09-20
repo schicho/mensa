@@ -19,6 +19,17 @@ import (
 var colorReset = "\033[0m"
 var colorRed = "\033[31;1m"
 
+func init() {
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, "Prints the meals served this week at the canteen.\n")
+		fmt.Fprint(os.Stderr, "Edit the configuration file in .config/mensa_conf.json to switch to a different\n")
+		fmt.Fprint(os.Stderr, "university or to a different pricing (Students/Employees/Guests).\n\n")
+		fmt.Fprint(os.Stderr, "Usage:\n")
+		flag.PrintDefaults()
+		fmt.Fprint(os.Stderr, "\nMensa CLI - https://github.com/schicho/mensa\n")
+	}
+}
+
 func main() {
 	var clearConfigCache bool
 	var forceDownloadData bool
@@ -57,7 +68,6 @@ func main() {
 
 		fmt.Fprintln(os.Stderr, "Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
-		configuration.UpdateConfigFile()
 		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
 		if err != nil {
 			panic(err)
@@ -75,6 +85,7 @@ func main() {
 			log.Println(err)
 		}
 
+		configuration.UpdateConfigFile()
 	} else {
 		fmt.Fprintln(os.Stderr, "Using cached data of", canteen.Abbrev2Canteens[configuration.University])
 		canteenDataFile, err := os.OpenFile(config.FilepathCache, os.O_RDONLY, os.ModePerm)
