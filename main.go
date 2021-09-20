@@ -30,8 +30,10 @@ func main() {
 	flag.BoolVar(&printNoColor, "n", false, "do not color the output text (no red weekdays)")
 	flag.Parse()
 
+	configuration := config.GetConfig()
+
 	if clearConfigCache {
-		config.BuildNewConfig()
+		configuration.BuildNewConfig()
 		return
 	}
 
@@ -39,10 +41,6 @@ func main() {
 		colorReset = ""
 		colorRed = ""
 	}
-
-	// Have main package configuration equal to the one in the config package
-	config.LoadConfig()
-	configuration := *config.GetConfig()
 
 	cachedYear, _ := configuration.Cached.ISOWeek()
 	currentYear, _ := time.Now().ISOWeek()
@@ -59,7 +57,7 @@ func main() {
 
 		fmt.Fprintln(os.Stderr, "Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
-		config.UpdateConfigFile()
+		configuration.UpdateConfigFile()
 		canteenData, err = download.GetCSV(download.GenerateURL(configuration.University))
 		if err != nil {
 			panic(err)

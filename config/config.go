@@ -32,12 +32,11 @@ type Config struct {
 	Price      PriceType `json:"price"`
 }
 
-// config stores the currently loaded user data configuration
-var config Config
-
-// GetConfig returns a pointer to the loaded user data
+// GetConfig returns a pointer to the loaded user data.
 func GetConfig() *Config {
-	return &config
+	c := &Config{}
+	c.loadConfig()
+	return c
 }
 
 // init the filepath to config and cache.
@@ -53,7 +52,7 @@ func init() {
 }
 
 // LoadConfig checks if there exists a previous configuration and loads it, or generates a new one and saves it to disk.
-func LoadConfig() {
+func (c *Config) loadConfig() {
 	if Exists(FilepathConfig) {
 		configFile, err := os.OpenFile(FilepathConfig, os.O_RDONLY, os.ModePerm)
 		if err != nil {
@@ -66,29 +65,29 @@ func LoadConfig() {
 			panic(err)
 		}
 
-		err = json.Unmarshal(buffer, &config)
+		err = json.Unmarshal(buffer, c)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Malformed `mensa_conf.json` file. Default to Student of Uni Passau.")
-			config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
-			writeConfigFile()
+			c = &Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
+			c.writeConfigFile()
 		}
 	} else {
 		// Default to known values and create config file.
 		fmt.Fprintln(os.Stderr, "No `mensa_conf.json` file. Creating new file. Default to Student of Uni Passau.")
-		config = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
-		writeConfigFile()
+		c = &Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
+		c.writeConfigFile()
 	}
 }
 
 // UpdateConfigFile just updates the timestamp in the configuration file, if new data was cached.
-func UpdateConfigFile() {
-	config = Config{config.University, time.Now(), config.Price}
-	writeConfigFile()
+func (c *Config) UpdateConfigFile() {
+	c = &Config{c.University, time.Now(), c.Price}
+	c.writeConfigFile()
 }
 
 // writeConfigFile reads the data stored in the config variable, marshals it and writes it to disk.
-func writeConfigFile() {
-	buffer, err := json.Marshal(config)
+func (c *Config) writeConfigFile() {
+	buffer, err := json.Marshal(c)
 	if err != nil {
 		panic(err)
 	}
@@ -119,9 +118,9 @@ func deleteConfigCache() {
 }
 
 // BuildNewConfig deletes the config and cache files from disk and creates a new default config file.
-func BuildNewConfig() {
+func (c *Config) BuildNewConfig() {
 	deleteConfigCache()
-	LoadConfig()
+	c.loadConfig()
 }
 
 // Exists checks if a file or directory exists.
