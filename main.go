@@ -55,7 +55,7 @@ func main() {
 
 	// Check if we can (still) use the cached data or need to download first and cache.
 	if forceDownloadData || cachedDay < currentDay || cachedYear < currentYear || ((currentWeekday == time.
-		Saturday || currentWeekday == time.Sunday) && configuration.Cached.Unix() < time.Now().Unix()) || !config.Exists(config.FilepathCache) {
+		Saturday || currentWeekday == time.Sunday) && cachedDay < currentDay) || !config.Exists(config.FilepathCache) {
 
 		fmt.Fprintln(os.Stderr, "Downloading new data...", canteen.Abbrev2Canteens[configuration.University])
 
