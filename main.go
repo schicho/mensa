@@ -100,6 +100,7 @@ func main() {
 	}
 
 	var meals []*canteen.Dish
+	var mealsByDay [7][]*canteen.Dish
 
 	gocsv.SetCSVReader(csvutil.NewSemicolonReader)
 	err = gocsv.UnmarshalBytes(canteenData, &meals)
@@ -107,35 +108,25 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	// Shorten too long entries.
+	// Sort meals by weekdays.
 	for _, meal := range meals {
+		// Shorten too long entries.
 		if len(meal.Name) > 60 {
 			meal.Name = substring.SubstringEnd(meal.Name, 60-len(meal.MealType)) + "..."
 		}
-	}
-
-	// Separate dishes by day.
-	type MealDay struct {
-		*canteen.Dish
-		Weekday time.Weekday
-	}
-	var mealsByDay [7][]MealDay
-
-	for _, meal := range meals {
 		timestamp, err := time.Parse("02.01.2006", meal.Date)
 		if err != nil {
 			panic(err)
 		}
 		weekday := timestamp.Weekday()
-		mealsByDay[weekday] = append(mealsByDay[weekday], MealDay{meal, weekday})
+		mealsByDay[weekday] = append(mealsByDay[weekday], meal)
 	}
 
 	// Print dishes sorted by weekdays.
-	todayWeekday := time.Now().Weekday()
-	for _, meals := range mealsByDay {
+	for day, meals := range mealsByDay {
 		if len(meals) > 0 {
-			if !printTodayOnly || meals[0].Weekday == todayWeekday {
-				fmt.Printf("%s%v %v:%s\n", colorRed, meals[0].Date, meals[0].Weekday, colorReset)
+			if !printTodayOnly || day == int(currentWeekday) {
+				fmt.Printf("%s%v %v:%s\n", colorRed, meals[0].Date, time.Weekday(day), colorReset)
 				for _, meal := range meals {
 					switch configuration.Price {
 					case config.PriceStudent_t:
