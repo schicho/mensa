@@ -14,6 +14,8 @@ import (
 const FilenameConfig = "mensa_conf.json"
 const FilenameCache = "mensa_data.csv"
 
+var defaultConfig = Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
+
 var FilepathConfig string
 var FilepathCache string
 
@@ -68,20 +70,20 @@ func (c *Config) loadConfig() {
 		err = json.Unmarshal(buffer, c)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Malformed `mensa_conf.json` file. Default to Student of Uni Passau.")
-			c = &Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
+			c = &defaultConfig
 			c.writeConfigFile()
 		}
 	} else {
 		// Default to known values and create config file.
 		fmt.Fprintln(os.Stderr, "No `mensa_conf.json` file. Creating new file. Default to Student of Uni Passau.")
-		c = &Config{canteen.Canteens2Abbrev["UNI_PASSAU_CANTEEN"], time.Time{}, PriceStudent_t}
+		c = &defaultConfig
 		c.writeConfigFile()
 	}
 }
 
 // UpdateConfigFile just updates the timestamp in the configuration file, if new data was cached.
 func (c *Config) UpdateConfigFile() {
-	c = &Config{c.University, time.Now(), c.Price}
+	c.Cached = time.Now()
 	c.writeConfigFile()
 }
 
