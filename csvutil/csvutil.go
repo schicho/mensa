@@ -3,6 +3,7 @@ package csvutil
 import (
 	"encoding/csv"
 	"io"
+	"regexp"
 	"strings"
 
 	"github.com/gocarina/gocsv"
@@ -10,6 +11,7 @@ import (
 )
 
 var replaceNewlineSemicolon = strings.NewReplacer("\n;", ";")
+var regexRemoveBrackets = regexp.MustCompile(`[\s]*\([^\)]*\)`)
 
 // NewSemicolonReader is a stdlib CSV reader, but with a semicolon as separator, as it's needed for the files we parse.
 func NewSemicolonReader(in io.Reader) gocsv.CSVReader {
@@ -24,6 +26,11 @@ func NewSemicolonReader(in io.Reader) gocsv.CSVReader {
 // thus is easily fixable.
 func FixCSVFormatting(in string) string {
 	return replaceNewlineSemicolon.Replace(in)
+}
+
+// RemoveBrackets removes all substrings of the form `(xyz)`.
+func RemoveBrackets(in string) string {
+	return regexRemoveBrackets.ReplaceAllLiteralString(in, ``)
 }
 
 // Windows1252ToUTF8 The CSV is Windows1252 encoded, but we want UTF8 to work with strings and cache the data.

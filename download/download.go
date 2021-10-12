@@ -22,7 +22,7 @@ const (
 func GetCSV(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, errors.New("Could not download mensa data.")
+		return nil, errors.New("could not download mensa data")
 	}
 	defer resp.Body.Close()
 
@@ -35,6 +35,7 @@ func GetCSV(url string) ([]byte, error) {
 
 	// Fix formatting early, so we don't need to bother later.
 	responseString = csvutil.FixCSVFormatting(responseString)
+	responseString = csvutil.RemoveBrackets(responseString)
 
 	return []byte(responseString), nil
 }
